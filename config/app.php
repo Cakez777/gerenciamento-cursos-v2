@@ -123,4 +123,19 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'providers' => [
+
+    App\Providers\RouteServiceProvider::class,
+     Illuminate\Filesystem\FilesystemServiceProvider::class,
+],
+
+
+'aliases' => [
+    // ...
+    'Files' => Illuminate\Support\Facades\File::class,
+    'File' => Illuminate\Support\Facades\File::class,
+]
+
 ];
+
+
