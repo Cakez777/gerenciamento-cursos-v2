@@ -2,33 +2,42 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
     public function totalInvestedByStudent()
     {
-        return Enrollment::selectRaw('students.name, SUM(enrollments.price_paid) as total_invested')
-            ->join('students', 'students.id', '=', 'enrollments.student_id')
+        $data = DB::table('enrollments')
+            ->join('students', 'enrollments.student_id', '=', 'students.id')
+            ->select('students.name', DB::raw('SUM(enrollments.price_paid) as total_invested'))
             ->groupBy('students.id', 'students.name')
             ->get();
+
+        return response()->json($data);
     }
 
     public function topCourses()
     {
-        return Enrollment::selectRaw('courses.name, COUNT(*) as total_students')
-            ->join('courses', 'courses.id', '=', 'enrollments.course_id')
+        $data = DB::table('enrollments')
+            ->join('courses', 'enrollments.course_id', '=', 'courses.id')
+            ->select('courses.name', DB::raw('COUNT(enrollments.id) as total_students'))
             ->groupBy('courses.id', 'courses.name')
             ->orderByDesc('total_students')
             ->get();
+
+        return response()->json($data);
     }
 
     public function revenueByCourse()
     {
-        return Enrollment::selectRaw('courses.name, SUM(enrollments.price_paid) as total_revenue')
-            ->join('courses', 'courses.id', '=', 'enrollments.course_id')
+        $data = DB::table('enrollments')
+            ->join('courses', 'enrollments.course_id', '=', 'courses.id')
+            ->select('courses.name', DB::raw('SUM(enrollments.price_paid) as total_revenue'))
             ->groupBy('courses.id', 'courses.name')
             ->get();
+
+        return response()->json($data);
     }
 }

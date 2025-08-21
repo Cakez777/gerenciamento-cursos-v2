@@ -3,18 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Enrollment;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EnrollmentController extends Controller
 {
-    public function index()
+    public function index(): JsonResponse
     {
-        return response()->json(Enrollment::with(['student', 'course'])->get());
+        return response()->json([
+            'data' => Enrollment::with(['student', 'course'])->get()
+        ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'student_id' => 'required|exists:students,id',
             'course_id' => 'required|exists:courses,id',
             'start_date' => 'required|date',
@@ -22,18 +25,19 @@ class EnrollmentController extends Controller
             'status' => 'required|in:active,cancelled,completed'
         ]);
 
-        $enrollment = Enrollment::create($data);
-        return response()->json($enrollment, 201);
+        $enrollment = Enrollment::create($validated);
+        return response()->json(['data' => $enrollment->load(['student', 'course'])], 201);
     }
 
-    public function show(Enrollment $enrollment)
+    public function show($id): JsonResponse
     {
-        return response()->json($enrollment->load(['student', 'course']));
+        $enrollment = Enrollment::with(['student', 'course'])->findOrFail($id);
+        return response()->json(['data' => $enrollment]);
     }
 
-    public function update(Request $request, Enrollment $enrollment)
+    public function update(Request $request, $id): JsonResponse
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'student_id' => 'sometimes|exists:students,id',
             'course_id' => 'sometimes|exists:courses,id',
             'start_date' => 'sometimes|date',
@@ -41,12 +45,14 @@ class EnrollmentController extends Controller
             'status' => 'sometimes|in:active,cancelled,completed'
         ]);
 
-        $enrollment->update($data);
-        return response()->json($enrollment);
+        $enrollment = Enrollment::findOrFail($id);
+        $enrollment->update($validated);
+        return response()->json(['data' => $enrollment->load(['student', 'course'])]);
     }
 
-    public function destroy(Enrollment $enrollment)
+    public function destroy($id): JsonResponse
     {
+        $enrollment = Enrollment::findOrFail($id);
         $enrollment->delete();
         return response()->json(null, 204);
     }

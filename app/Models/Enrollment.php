@@ -2,14 +2,26 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Enrollment extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['student_id', 'course_id', 'start_date', 'price_paid', 'status'];
+    protected $fillable = [
+        'student_id', 
+        'course_id', 
+        'start_date', 
+        'price_paid', 
+        'status'
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'price_paid' => 'decimal:2',
+        'status' => 'string'
+    ];
 
     public function student()
     {
@@ -20,10 +32,4 @@ class Enrollment extends Model
     {
         return $this->belongsTo(Course::class);
     }
-
-    protected $casts = [
-        'start_date' => 'date',
-        'price_paid' => 'decimal:2',
-        'status' => 'string'
-    ];
 }

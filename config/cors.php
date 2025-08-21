@@ -3,9 +3,10 @@
 return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => ['*'], // Ou defina origens específicas: ['http://localhost:3000']
+    'allowed_origins' => ['http://localhost:3000'], // URL do React
+    'allowed_origins_patterns' => [],
     'allowed_headers' => ['*'],
     'exposed_headers' => [],
     'max_age' => 0,
-    'supports_credentials' => false,
+    'supports_credentials' => true, // ← ALTERE PARA TRUE
 ];
